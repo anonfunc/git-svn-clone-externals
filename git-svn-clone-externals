@@ -95,12 +95,18 @@ function is_excluded()
     return
 }
 
+show_externals () {
+    if [[ -f .git_externals_include ]] ; then
+        cat .git_externals_include
+    else
+        git svn show-externals | grep -vE '#|^$'
+    fi
+}
 
-git svn show-externals | grep -vE '#|^$' | \
+show_externals | \
     sed 's/\(-r\)[ ]*\([0-9]\{1,\}\)/\1\2/' | \
     while read svn_externals
 do
-
     number_fields="$(echo ${svn_externals}|awk '{print NF}')"
     case $number_fields in
         2)
@@ -118,11 +124,9 @@ do
 
     check_excluded=$(is_excluded $local_directory)
     if [ $check_excluded -eq 0 ] ; then
-        if [ -n "$USE_SSH" ]; then
-            echo "Rewriting url to use SVN+SSH."
-            shopt -s extglob
-            remote_url="${remote_url/+(http|https)/svn+ssh}"
-        fi
+        echo "Rewriting url to use SVN+SSH."
+        shopt -s extglob
+        remote_url="${remote_url/+(http|https|svn+cw)/svn+ssh}"
 
         [ -z "${remote_url}" ] && continue
 
