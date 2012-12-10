@@ -1,18 +1,25 @@
 #!/bin/bash
+	   
+toplevel_directory="$(git rev-parse --show-cdup)"
+[ -n "$toplevel_directory" ] && { echo "please run from the toplevel directory"; exit 1; }
 
-for dir in *; do
+git-svn-check-unpushed () {
+    SVNTIP=$( git rev-list -n1 --grep=git-svn-id HEAD )
+    git log --pretty="format:" --name-only $SVNTIP..HEAD | sort | uniq
+}
+
+find .git_externals -type 'd' -name '.git' | while read dir
+ do
     if [ -d $dir ]; then
-       cd $dir
-       STATUS=$(git status)
+       cd $dir/..
+       STATUS=$(git status --short)
        UNPUSHED=$(git-svn-check-unpushed)
-       if [ $(echo $STATUS|grep -c "clean") -lt 1 -o \
-	    $(echo $UNPUSHED|grep -c "No unpushed") -lt 1 ]; then
-	   echo '>>>>>>>>>>>>>>>>' $dir '<<<<<<<<<<<<<<<<'
-	   git status
-	   git-svn-check-unpushed
-	   echo '----------------------------------------'
+       if [[ -n "$STATUS" || -n "$UNPUSHED" ]]
+       then
+           echo '>>>>>>>>>>>>>>>>' $(PWD) '<<<<<<<<<<<<<<<<'
+           echo '----------------------------------------'
        else
-	   echo $dir 'is clean'
+           echo $(PWD) 'has no local changes.'
        fi
        cd ..
    fi
