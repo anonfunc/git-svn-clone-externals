@@ -30,6 +30,9 @@ Enjoy,
 
 - Andre Pang <ozone@algorithm.com.au>
 
+Forced USE_SSH to on, and can take the externals from a file .git_externals_include.
+- anonfunc@gmail.com
+
 
 Tools
 =====
@@ -39,46 +42,34 @@ svn:externals. However, in day-to-day work I want to check whether I
 need to push stuff and update a buch of 'external' repositories in one
 go. Therefore I creates some additional scripts.
 
-* ``git-svn-check-unpushed`` tries to determine whether there are
-  commits which are not yet pushed back to the subversion
-  repository. Originally I took this idea from Magit (an interface to
-  the version control system Git, implemented as an extension to
-  Emacs) and implemented it in Python instead of Lisp.
-
-  This script can be run in every location of a git repository.
-
 * git-svn-externals-check is a script that displays whether there are
   uncommitted changes or commits that are not pushed to the subversion
   repository yet. Basically it executes ``git status`` and the
   ``git-svn-check-unpushed`` scripts for each directory in the current
   directory.
 
-  This script must be run in the directory where the original
-  svn:externals property was set. It does not walk the complete tree
-  to search for these kind of repositories.
-
 * git-svn-externals-update complements the git-svn-externals-check
   script. The update script does an ``git svn fetch`` and ``git svn
   rebase`` for every directory in the location where the script is
   executed.
 
-  This script must also be run in the directory where the original
-  svn:externals property was set.
-
-
 Feel free to use and improve these scripts.
 
 - Mark van Lent <mark@vlent.nl>
 
+Removed git-svn-check-unpushed, replaced usage in git-svn-externals-check.
+- anonfunc@gmail.com
+
 Options
 =======
 
-* External repository's url can be rewritten, to use SVN+SSH instead of
-  plain HTTP or HTTPS. To do so, do `export USE_SSH=yes` in your environment.
-  This can be useful if you use ssh authentication, but other developers don't.
+* External repository's url are rewritten to use SVN+SSH.
 * If you don't want to pull all external repositories, you can create a
   .git_externals_exclude file which contains the local paths to be excluded,
   one per line, the same way they show up on the first field of git svn show-externals
+* You can also create a
+  .git_externals_include file which contains the externals to be included,
+  one per line, the same way they show up as the whole line of git svn show-externals
 
 - Alexander Artemenko <svetlyak.40wt@gmail.com>
-
+- anonfunc@gmail.com
